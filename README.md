@@ -36,4 +36,6 @@ pip install requests
 
 git clone https://github.com/mabusaeid01-droid/otp-tester.git
 
+cd ~/otp-tester
+
 python main.py
