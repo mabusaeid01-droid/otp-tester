@@ -26,5 +26,14 @@ This is a high-speed API request testing tool with a professional ASCII interfac
 পাবলিক বা আপনার বন্ধুরা এটি ব্যবহার করতে চাইলে তাদের শুধু নিচের এই **এক লাইনের কমান্ডটি** কপি করে তাদের Termux-এ পেস্ট করতে বলুন:
 
 ```bash
-pkg update && pkg upgrade -y && pkg install python git -y && pip install requests && git clone [https://github.com/mabusaeid01-droid/otp-tester.git](https://github.com/mabusaeid01-droid/otp-tester.git) && cd otp-tester && python main.py
+pkg update
 
+pkg upgrade -y
+
+pkg install python git -y
+
+pip install requests
+
+git clone https://github.com/mabusaeid01-droid/otp-tester.git
+
+python mine.py
